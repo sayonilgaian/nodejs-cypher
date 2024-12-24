@@ -31,12 +31,7 @@ export default async function shortestPath({
 
 	try {
 		const result = await session.run(query);
-		// const relationships = result.records.map((record) => ({
-		// 	startNode: record.get('n'), // Starting node
-		// 	relationship: record.get('r'), // Relationship
-		// 	endNode: record.get('m'), // End node
-		// }));
-		// return relationships;
+
 		return result.records;
 	} catch (err) {
 		console.error(`Query error: ${err.message}`);

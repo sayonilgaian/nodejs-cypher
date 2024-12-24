@@ -1,32 +1,39 @@
 export default async function filterNodes({
+	driver,
 	nodeType,
 	nodeAttribute,
 	filterName,
-	driver,
+	limit = 25,
 }) {
-	if (!nodeAttribute || !nodeType || !filterName) {
+	console.log(nodeType, nodeAttribute, filterName);
+	if (!nodeType) {
 		return {
-			status: 'Failed!',
-			message: "nodeType, nodeAttribute, filterName can't be empty!",
+			status: 'Missing required parameters!',
+			message: "nodeType can't be empty!",
 		};
 	}
 
-	const query = `
-      MATCH (n:${nodeType} {${nodeAttribute}: $filterName})
+	if ((nodeAttribute && !filterName) || (!nodeAttribute && filterName)) {
+		return {
+			status: 'Missing required parameters!',
+			message: "nodeAttribute and filterName can't be empty at the same time!",
+		};
+	}
+
+	let query = `
+      MATCH (n:${nodeType} {${nodeAttribute}: ${filterName}})
       RETURN n
     `;
 	const session = driver.session();
 
-	// TODO: write logic to get all nodes if filterName is not present
-	// if (!filterName) {
-	// 	query = `
-	//   MATCH (n:${nodeType}) RETURN n
-	// `;
-	// }
+	if (!filterName || !nodeAttribute) {
+		query = `MATCH (n:${nodeType}) RETURN n LIMIT ${limit}`;
+	}
 
 	try {
-		const result = await session.run(query, { filterName });
+		const result = await session.run(query);
 		const nodes = result.records.map((record) => record.get('n'));
+		console.log(query);
 		return nodes;
 	} catch (err) {
 		console.error(`Query error: ${err.message}`);

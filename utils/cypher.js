@@ -3,6 +3,8 @@ import filterNodes from './queryTypes/filterNodes.js';
 import filterRelationships from './queryTypes/filterRelationships.js';
 import filterSpecificRealationships from './queryTypes/filterSpecificRealationships.js';
 import shortestPath from './queryTypes/shortestPath.js';
+import findChildren from './queryTypes/findChildren.js';
+import findParents from './queryTypes/findParents.js';
 
 export async function connect() {
 	const URI = 'neo4j+s://ce441ab3.databases.neo4j.io';
@@ -40,6 +42,10 @@ export async function runQuery({ driver, ...body }) {
 			});
 		case 'shortest-path':
 			return shortestPath({ driver, ...body });
+		case 'find-children':
+			return findChildren({ driver, ...body });
+		case 'find-parents':
+			return findParents({ driver, ...body });
 		default:
 			break;
 	}
