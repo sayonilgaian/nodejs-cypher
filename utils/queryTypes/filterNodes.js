@@ -20,10 +20,7 @@ export default async function filterNodes({
 		};
 	}
 
-	let query = `
-      MATCH (n:${nodeType} {${nodeAttribute}: ${filterName}})
-      RETURN n
-    `;
+	let query = `MATCH (n:${nodeType} {${nodeAttribute}: "${filterName}"}) RETURN n`;
 	const session = driver.session();
 
 	if (!filterName || !nodeAttribute) {
@@ -33,8 +30,10 @@ export default async function filterNodes({
 	try {
 		const result = await session.run(query);
 		const nodes = result.records.map((record) => record.get('n'));
-		console.log(query);
-		return nodes;
+		return {
+			data: nodes,
+			cypherQuery: query,
+		};
 	} catch (err) {
 		console.error(`Query error: ${err.message}`);
 		throw new Error(`Query failed: ${err.message}`);

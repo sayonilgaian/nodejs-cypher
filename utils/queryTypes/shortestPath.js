@@ -22,17 +22,16 @@ export default async function shortestPath({
 		.map((key) => `m.${key}="${endNodeDetails[key]}"`)
 		.reduce((prev, curr) => `${prev} AND ${curr}`);
 
-	const query = `
-	  MATCH p = SHORTEST ${shortestPathsNumber} (n:${startNodeType})-[r]-+(m:${endNodeType})
-        WHERE ${startNodeConditions} AND ${endNodeConditions}
-        RETURN p AS result
-	`;
+	const query = `MATCH p = SHORTEST ${shortestPathsNumber} (n:${startNodeType})-[r]-+(m:${endNodeType})WHERE ${startNodeConditions} AND ${endNodeConditions}RETURN p AS result`;
 	const session = driver.session();
 
 	try {
 		const result = await session.run(query);
 
-		return result.records;
+		return {
+			data: result.records,
+			cypherQuery: query,
+		};
 	} catch (err) {
 		console.error(`Query error: ${err.message}`);
 		throw new Error(`Query failed: ${err.message}`);

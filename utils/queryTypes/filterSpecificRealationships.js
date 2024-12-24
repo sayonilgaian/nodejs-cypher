@@ -4,7 +4,6 @@ export default async function filterSpecificRealationships({
 	endNodeType,
 	relationshipType,
 }) {
-
 	if (!startNodeType || !endNodeType || !relationshipType) {
 		return {
 			status: 'Failed!',
@@ -12,10 +11,7 @@ export default async function filterSpecificRealationships({
 		};
 	}
 
-	const query = `
-	  MATCH (n:${startNodeType})-[r:${relationshipType}]->(m:${endNodeType})
-        RETURN n,r,m
-	`;
+	const query = `MATCH (n:${startNodeType})-[r:${relationshipType}]->(m:${endNodeType}) RETURN n,r,m`;
 	const session = driver.session();
 
 	try {
@@ -25,7 +21,10 @@ export default async function filterSpecificRealationships({
 			relationship: record.get('r'), // Relationship
 			endNode: record.get('m'), // End node
 		}));
-		return relationships;
+		return {
+			data: relationships,
+			cypherQuery: query,
+		};
 	} catch (err) {
 		console.error(`Query error: ${err.message}`);
 		throw new Error(`Query failed: ${err.message}`);

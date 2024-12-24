@@ -10,9 +10,7 @@ export default async function findRelationships({
 		};
 	}
 
-	const query = `
-	  MATCH (n {${nodeAttribute}: "${filterName}"})-[r]-(m) RETURN n,r,m
-	`;
+	const query = `MATCH (n {${nodeAttribute}: "${filterName}"})-[r]-(m) RETURN n,r,m`;
 	const session = driver.session();
 
 	try {
@@ -22,7 +20,10 @@ export default async function findRelationships({
 			relationship: record.get('r'), // Relationship
 			connectedNode: record.get('m'), // Connected node
 		}));
-		return relationships;
+		return {
+			data: relationships,
+			cypherQuery: query,
+		};
 	} catch (err) {
 		console.error(`Query error: ${err.message}`);
 		throw new Error(`Query failed: ${err.message}`);

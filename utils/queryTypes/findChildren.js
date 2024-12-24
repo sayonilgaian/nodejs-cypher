@@ -19,16 +19,16 @@ export default async function findChildren({
 		.map((key, index) => `start.${key}="${startNodeDetails[key]}"`)
 		.reduce((prev, curr) => `${prev} AND ${curr}`);
 
-	const query = `MATCH path = (start ${initialCondition})
-        -[*..${depth}]->(child) 
-        WHERE ${startNodeConditions} 
-        RETURN path, length(path) AS pathLength`;
+	const query = `MATCH path = (start ${initialCondition})-[*..${depth}]->(child) WHERE ${startNodeConditions} RETURN path, length(path) AS pathLength`;
 
 	const session = driver.session();
 	try {
 		const result = await session.run(query);
 
-		return result.records;
+		return {
+			data: result.records,
+			cypherQuery: query,
+		};
 	} catch (err) {
 		console.error(`Query error: ${err.message}`);
 		throw new Error(`Query failed: ${err.message}`);

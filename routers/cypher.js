@@ -18,13 +18,19 @@ cypherRouter.post('/query', async (req, res) => {
 		const { driver } = await connect();
 
 		// Run the query
-		const nodes = await runQuery({
+		const queryResult = await runQuery({
 			driver,
 			...req.body,
 		});
 
 		// Send the response
-		return res.status(200).json({ success: true, data: nodes });
+		return res
+			.status(200)
+			.json({
+				success: true,
+				data: queryResult?.data,
+				cypherQuery: queryResult.cypherQuery,
+			});
 	} catch (err) {
 		return res.status(500).json({ success: false, error: err.message });
 	}
