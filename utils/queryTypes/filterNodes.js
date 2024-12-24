@@ -1,9 +1,16 @@
 export default async function filterNodes({
 	nodeType,
 	nodeAttribute,
-	driver,
 	filterName,
+	driver,
 }) {
+	if (!nodeAttribute || !nodeType || !filterName) {
+		return {
+			status: 'Failed!',
+			message: "nodeType, nodeAttribute, filterName can't be empty!",
+		};
+	}
+
 	const query = `
       MATCH (n:${nodeType} {${nodeAttribute}: $filterName})
       RETURN n
@@ -13,8 +20,8 @@ export default async function filterNodes({
 	// TODO: write logic to get all nodes if filterName is not present
 	// if (!filterName) {
 	// 	query = `
-    //   MATCH (n:${nodeType}) RETURN n
-    // `;
+	//   MATCH (n:${nodeType}) RETURN n
+	// `;
 	// }
 
 	try {

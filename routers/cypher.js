@@ -13,25 +13,19 @@ cypherRouter.post('/connect', async (req, res) => {
 });
 
 cypherRouter.post('/query', async (req, res) => {
-	const { queryType, nodeType, nodeAttribute, filterName } = req.body;
-
 	try {
 		// Establish connection
 		const { driver } = await connect();
 
 		// Run the query
-		const nodes = await runQuery(
+		const nodes = await runQuery({
 			driver,
-			queryType,
-			nodeType,
-			nodeAttribute,
-			filterName
-		);
+			...req.body,
+		});
 
 		// Send the response
 		return res.status(200).json({ success: true, data: nodes });
 	} catch (err) {
-		console.error(err.message);
 		return res.status(500).json({ success: false, error: err.message });
 	}
 });

@@ -1,9 +1,11 @@
-export default async function findRelationships({
+export default async function filterSpecificRealationships({
 	driver,
-	nodeAttribute,
-	filterName,
+	startNodeType,
+	endNodeType,
+	relationshipType,
 }) {
-	if (!nodeAttribute || !filterName) {
+
+	if (!startNodeType || !endNodeType || !relationshipType) {
 		return {
 			status: 'Failed!',
 			message: "nodeAttribute, filterName can't be empty!",
@@ -11,16 +13,17 @@ export default async function findRelationships({
 	}
 
 	const query = `
-	  MATCH (n {${nodeAttribute}: "${filterName}"})-[r]-(m) RETURN n,r,m
+	  MATCH (n:${startNodeType})-[r:${relationshipType}]->(m:${endNodeType})
+        RETURN n,r,m
 	`;
 	const session = driver.session();
 
 	try {
 		const result = await session.run(query);
 		const relationships = result.records.map((record) => ({
-			node: record.get('n'), // Starting node
+			startNode: record.get('n'), // Starting node
 			relationship: record.get('r'), // Relationship
-			connectedNode: record.get('m'), // Connected node
+			endNode: record.get('m'), // End node
 		}));
 		return relationships;
 	} catch (err) {

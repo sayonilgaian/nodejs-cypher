@@ -1,6 +1,8 @@
 import * as neo4j from 'neo4j-driver';
 import filterNodes from './queryTypes/filterNodes.js';
 import filterRelationships from './queryTypes/filterRelationships.js';
+import filterSpecificRealationships from './queryTypes/filterSpecificRealationships.js';
+import shortestPath from './queryTypes/shortestPath.js';
 
 export async function connect() {
 	const URI = 'neo4j+s://ce441ab3.databases.neo4j.io';
@@ -25,18 +27,19 @@ export async function connect() {
 	}
 }
 
-export async function runQuery(
-	driver,
-	queryType = 'filter-nodes',
-	nodeType = '',
-	nodeAttribute,
-	filterName
-) {
-	switch (queryType) {
+export async function runQuery({ driver, ...body }) {
+	switch (body?.queryType) {
 		case 'filter-nodes':
-			return filterNodes({ driver, nodeType, nodeAttribute, filterName });
+			return filterNodes({ driver, ...body });
 		case 'filter-edges':
-			return filterRelationships({ driver, nodeAttribute, filterName });
+			return filterRelationships({ driver, ...body });
+		case 'specific-edges':
+			return filterSpecificRealationships({
+				driver,
+				...body,
+			});
+		case 'shortest-path':
+			return shortestPath({ driver, ...body });
 		default:
 			break;
 	}
